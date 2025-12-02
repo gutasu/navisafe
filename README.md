@@ -23,4 +23,3 @@ Navisafe té com a objectiu desenvolupar un sistema de navegació assistida que 
 - **Adaptació a embarcacions:** Si superen els 15 metres.
 - **Comunicacions:** Per satèl·lit o sistemes de navegació professional.
 
-![Logo Navisafe.]([[https://drive.google.com/drive/u/1/folders/1iGWnArzFgvrztM3DXC_2mf60Ihz5iszc]]) 
