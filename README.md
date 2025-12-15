@@ -22,4 +22,29 @@ Navisafe té com a objectiu desenvolupar un sistema de navegació assistida que 
 - **Creació de hardware propi:** Utilitzar sensors i càmeres.
 - **Adaptació a embarcacions:** Si superen els 15 metres.
 - **Comunicacions:** Per satèl·lit o sistemes de navegació professional.
+Fites del projecte Navisafe
+Fase 1: Anàlisi i compatibilitat
+
+- Fita 1: Revisió i definició dels paquets de treball.
+- Fita 2: Realització del test de compatibilitat Navisafe.
+- Fita 3: Identificació de requisits dels usuaris i limitacions tècniques.
+
+Fase 2: Disseny i desenvolupament
+
+- Fita 1: Desenvolupament del motor semiautomatitzat i control de rumb.
+- Fita 2: Integració del control de velocitat i eficiència del combustible.
+- Fita 3: Creació de la interfície web i integració amb mapes digitals i altres sistemes.
+
+Fase 3: Proves i validació
+
+- Fita 1: Test de funcionalitat i seguretat del sistema.
+- Fita 2: Prova de càmera tèrmica, sonar i estabilització automàtica.
+- Fita 3: Ajustaments segons resultats i condicions reals de navegació.
+
+Fase 4: Implementació i lliurament
+
+- Fita 1: Instal·lació del sistema a embarcacions compatibles.
+- Fita 2: Formació dels usuaris i lliurament de documentació tècnica.
+- Fita 3: Revisió final i posada en funcionament del sistema
+
 
