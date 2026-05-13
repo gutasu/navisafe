@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navisafe.cat — Sistema de Monitoratge Marítim</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+
+/* ══════════════════════════════════════════
+   VARIABLES I RESET
+   ══════════════════════════════════════════ */
+:root {
+  --blue:    #1060e8;
+  --blue-d:  #0850cc;
+  --teal:    #00c9a7;
+  --teal-d:  #00a07d;
+  --navy:    #071e3d;
+  --navy-2:  #0d2d52;
+  --white:   #ffffff;
+  --off:     #f4f8fc;
+  --text:    #1a2e3b;
+  --muted:   #5a7a90;
+  --border:  #dce8f5;
+  --shadow:  rgba(16, 96, 232, 0.10);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--white);
+  color: var(--text);
+  overflow-x: hidden;
+}
+h1, h2, h3, h4 { font-family: 'Syne', sans-serif; }
+a { text-decoration: none; }
+img { max-width: 100%; display: block; }
+
+/* ══════════════════════════════════════════
+   HEADER
+   ══════════════════════════════════════════ */
+header {
+  position: sticky; top: 0; z-index: 200;
+  display: flex; align-items: center;
+  padding: 14px 20px 14px 20px;
+  background: rgba(255,255,255,0.97);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 16px var(--shadow);
+  backdrop-filter: blur(8px);
+}
+
+.header-logo img {
+  height: 44px; width: auto;
+}
+
+header nav {
+  margin-left: auto;
+  display: flex; align-items: center; gap: 2rem;
+}
+
+header nav a {
+  font-size: .87rem; color: var(--muted);
+  font-weight: 500; transition: color .2s;
+}
+header nav a:hover { color: var(--blue); }
+
+.btn-nav {
+  background: var(--blue); color: #fff;
+  border-radius: 50px;
+  padding: .5rem 1.3rem;
+  font-family: 'Syne', sans-serif;
+  font-size: .85rem; font-weight: 700;
+  transition: background .2s, transform .15s;
+}
+.btn-nav:hover { background: var(--blue-d); transform: translateY(-1px); color: #fff; }
+
+/* ══════════════════════════════════════════
+   HERO — text + panell
+   ══════════════════════════════════════════ */
+.hero {
+  background: linear-gradient(160deg, #e8f2ff 0%, #f0fbf8 60%, #ffffff 100%);
+  padding: 70px 24px 0;
+  text-align: center;
+}
+
+.hero-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,201,167,.1); border: 1px solid rgba(0,201,167,.3);
+  color: var(--teal-d); font-size: .77rem; font-weight: 600;
+  padding: .35rem 1rem; border-radius: 50px;
+  margin-bottom: 1.6rem; letter-spacing: .5px;
+}
+.hero-tag::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--teal); animation: blink 2s infinite;
+}
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.2} }
+
+.hero h1 {
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight: 800; line-height: 1.1;
+  color: var(--navy); max-width: 720px;
+  margin: 0 auto 1.2rem;
+}
+.hero h1 em { color: var(--teal); font-style: normal; }
+
+.hero-sub {
+  font-size: 1.05rem; color: var(--muted);
+  max-width: 520px; margin: 0 auto 2.2rem;
+  line-height: 1.8;
+}
+
+.hero-btns {
+  display: flex; gap: 1rem;
+  justify-content: center; flex-wrap: wrap;
+  margin-bottom: 3rem;
+}
+
+.btn-hero {
+  padding: .85rem 2.2rem; border-radius: 50px;
+  font-family: 'Syne', sans-serif;
+  font-size: .95rem; font-weight: 700;
+  cursor: pointer; border: none;
+  transition: all .2s; display: inline-block;
+}
+.btn-p { background: var(--blue); color: #fff; box-shadow: 0 4px 18px rgba(16,96,232,.3); }
+.btn-p:hover { background: var(--blue-d); transform: translateY(-2px); color: #fff; }
+.btn-o { background: transparent; color: var(--teal-d); border: 1.5px solid var(--teal); }
+.btn-o:hover { background: var(--teal); color: var(--navy); }
+
+/* Panell destacat fons_Navisafe.png */
+.hero-panel {
+  max-width: 900px; margin: 0 auto;
+}
+.panel-browser-bar {
+  background: var(--navy-2);
+  padding: .6rem 1rem;
+  display: flex; align-items: center; gap: .5rem;
+  border-radius: 14px 14px 0 0;
+}
+.dot { width: 11px; height: 11px; border-radius: 50%; }
+.dot-r { background: #ff5f57; }
+.dot-y { background: #ffbd2e; }
+.dot-g { background: #28c840; }
+.url-bar {
+  flex: 1; margin-left: .6rem;
+  background: rgba(255,255,255,.07); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 6px; padding: .22rem .75rem;
+  font-size: .72rem; color: rgba(255,255,255,.45);
+  font-family: 'DM Sans', monospace;
+}
+.panel-img-wrap {
+  border-radius: 0 0 14px 14px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(7,30,61,.18), 0 2px 8px rgba(0,0,0,.08);
+  border: 1px solid var(--border); border-top: none;
+  background: #f0f6fb;
+}
+.panel-img-wrap img {
+  width: 100%; height: auto;
+  object-fit: contain; display: block;
+}
+
+/* ══════════════════════════════════════════
+   SECCIONS GENERALS
+   ══════════════════════════════════════════ */
+.sec {
+  max-width: 1060px; margin: 0 auto;
+  padding: 80px 24px;
+}
+.sec-tag {
+  font-size: .72rem; text-transform: uppercase;
+  letter-spacing: 3px; color: var(--teal-d);
+  font-weight: 700; margin-bottom: .7rem;
+}
+.sec h2 {
+  font-size: 2rem; color: var(--navy);
+  margin-bottom: .9rem;
+}
+.sec-intro {
+  font-size: .97rem; color: var(--muted);
+  line-height: 1.8; max-width: 580px;
+  margin-bottom: 2.8rem;
+}
+
+/* ══════════════════════════════════════════
+   FUNCIONALITATS
+   ══════════════════════════════════════════ */
+#funcionalitats { background: var(--white); }
+
+.feat-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 1.1rem;
+}
+
+.feat {
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.8rem;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.feat:hover {
+  border-color: var(--teal);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 28px rgba(0,201,167,.12);
+}
+.feat-ico { font-size: 2rem; margin-bottom: .9rem; }
+.feat h3 { font-size: 1rem; color: var(--navy); margin-bottom: .45rem; }
+.feat p  { font-size: .85rem; color: var(--muted); line-height: 1.7; }
+
+/* ══════════════════════════════════════════
+   STATS
+   ══════════════════════════════════════════ */
+.stats-band {
+  background: var(--navy);
+  padding: 3.5rem 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 2rem; text-align: center;
+}
+.stat-n {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.6rem; font-weight: 800;
+  color: var(--teal);
+}
+.stat-l {
+  font-size: .8rem; color: rgba(255,255,255,.5);
+  margin-top: .3rem;
+}
+
+/* ══════════════════════════════════════════
+   COM FUNCIONA
+   ══════════════════════════════════════════ */
+#com-funciona { background: var(--off); }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  gap: 1.5rem;
+}
+.step { text-align: center; padding: 1.4rem; }
+.step-num {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: rgba(16,96,232,.08);
+  border: 2px solid var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 1.1rem; color: var(--blue);
+  margin: 0 auto 1rem;
+}
+.step h3 { font-size: .93rem; color: var(--navy); margin-bottom: .4rem; }
+.step p  { font-size: .82rem; color: var(--muted); line-height: 1.65; }
+
+/* ══════════════════════════════════════════
+   PREUS
+   ══════════════════════════════════════════ */
+#preus { background: var(--white); }
+
+.plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem;
+}
+.plan {
+  background: var(--off);
+  border: 1.5px solid var(--border);
+  border-radius: 16px; padding: 2rem;
+  position: relative;
+  transition: box-shadow .2s;
+}
+.plan:hover { box-shadow: 0 8px 32px var(--shadow); }
+.plan.featured { border-color: var(--teal); background: #f0fbf8; }
+
+.plan-badge {
+  position: absolute; top: -13px; left: 50%; transform: translateX(-50%);
+  background: var(--teal); color: var(--navy);
+  font-size: .68rem; font-weight: 800;
+  padding: 3px 14px; border-radius: 20px;
+  font-family: 'Syne', sans-serif; white-space: nowrap;
+}
+.plan-name {
+  font-size: .7rem; text-transform: uppercase;
+  letter-spacing: 2px; color: var(--muted); margin-bottom: .5rem;
+}
+.plan-price {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.4rem; font-weight: 800;
+  color: var(--navy); line-height: 1;
+}
+.plan-price span { font-size: .9rem; font-weight: 400; color: var(--muted); }
+.plan-desc {
+  font-size: .82rem; color: var(--muted);
+  margin: .9rem 0 1.4rem; line-height: 1.6;
+}
+.plan ul { list-style: none; margin-bottom: 1.6rem; }
+.plan li {
+  font-size: .83rem; color: var(--muted);
+  padding: .35rem 0;
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; gap: 8px;
+}
+.plan li::before { content: '✓'; color: var(--teal); font-weight: 700; flex-shrink: 0; }
+
+.btn-plan {
+  width: 100%; padding: .72rem;
+  border-radius: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: .88rem; font-weight: 700;
+  cursor: pointer; border: none;
+  text-decoration: none; display: block;
+  text-align: center; transition: all .2s;
+}
+.btn-plan-p { background: var(--blue); color: #fff; }
+.btn-plan-p:hover { background: var(--blue-d); }
+.btn-plan-o {
+  background: transparent; color: var(--teal-d);
+  border: 1.5px solid var(--teal);
+}
+.btn-plan-o:hover { background: var(--teal); color: var(--navy); }
+
+/* ══════════════════════════════════════════
+   TESTIMONIALS
+   ══════════════════════════════════════════ */
+.sec-testimonials { background: var(--off); }
+
+.test-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.2rem;
+}
+.test {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 1.7rem;
+  box-shadow: 0 2px 12px var(--shadow);
+}
+.test-text {
+  font-size: .87rem; color: var(--text);
+  line-height: 1.75; margin-bottom: 1.1rem;
+  font-style: italic;
+}
+.test-author { font-size: .78rem; color: var(--teal-d); font-weight: 700; }
+.test-role   { font-size: .72rem; color: var(--muted); }
+
+/* ══════════════════════════════════════════
+   SOBRE
+   ══════════════════════════════════════════ */
+.sec-sobre {
+  text-align: center;
+  background: var(--white);
+}
+.sobre-box {
+  max-width: 660px; margin: 0 auto;
+}
+.sobre-box p {
+  color: var(--muted); line-height: 1.85;
+  font-size: .96rem; margin-bottom: 1.3rem;
+}
+.sobre-box strong { color: var(--navy); }
+
+/* ══════════════════════════════════════════
+   CTA FINAL
+   ══════════════════════════════════════════ */
+.cta-band {
+  background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+  text-align: center; padding: 70px 24px;
+}
+.cta-band h2 {
+  font-size: 2.1rem; color: #fff; margin-bottom: .9rem;
+}
+.cta-band p {
+  font-size: .97rem; color: rgba(255,255,255,.55);
+  max-width: 480px; margin: 0 auto 2.2rem; line-height: 1.7;
+}
+
+/* ══════════════════════════════════════════
+   FOOTER
+   ══════════════════════════════════════════ */
+footer {
+  background: var(--navy);
+  padding: 2rem 24px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap; gap: 1rem;
+  max-width: 100%;
+}
+.footer-logo img { height: 36px; width: auto; }
+
+footer p { font-size: .77rem; color: rgba(255,255,255,.35); line-height: 1.6; }
+
+.footer-links { display: flex; gap: 1.4rem; }
+.footer-links a {
+  font-size: .77rem; color: rgba(255,255,255,.35);
+  transition: color .2s;
+}
+.footer-links a:hover { color: var(--teal); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+   ══════════════════════════════════════════ */
+@media (max-width: 700px) {
+  header nav a:not(.btn-nav) { display: none; }
+  .hero { padding: 50px 16px 0; }
+  .sec  { padding: 56px 16px; }
+  footer { flex-direction: column; align-items: center; text-align: center; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     HEADER
+     ══════════════════════════════════════ -->
+<header>
+  <div class="header-logo">
+    <img src="logo_Navisafe.png" alt="Navisafe">
+  </div>
+  <nav>
+    <a href="#funcionalitats">Funcionalitats</a>
+    <a href="#com-funciona">Com funciona</a>
+    <a href="#preus">Preus</a>
+    <a href="#sobre">Sobre</a>
+    <a href="dashboard.html" class="btn-nav">Accedir →</a>
+  </nav>
+</header>
+
+
+<!-- ══════════════════════════════════════
+     HERO
+     ══════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-tag">Sistema actiu · Costa Brava · Palamós</div>
+
+  <h1>El teu vaixell,<br>sempre <em>sota control</em></h1>
+
+  <p class="hero-sub">
+    Navisafe és la plataforma de monitoratge marítim que et permet supervisar
+    tots els sensors del teu vaixell en temps real, des de qualsevol dispositiu.
+  </p>
+
+  <div class="hero-btns">
+    <a href="dashboard.html" class="btn-hero btn-p">🚀 Accedir al sistema</a>
+    <a href="#funcionalitats" class="btn-hero btn-o">Descobrir més</a>
+  </div>
+
+  <!-- Panell dashboard: fons_Navisafe.png -->
+    <div class="panel-img-wrap">
+      <img src="fons_Navisafe.png" alt="Panell de control Navisafe — Vista en temps real">
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FUNCIONALITATS
+     ══════════════════════════════════════ -->
+<section class="sec" id="funcionalitats">
+  <div class="sec-tag">Tecnologia a bord</div>
+  <h2>Tot el que necessites per navegar segur</h2>
+  <p class="sec-intro">
+    Navisafe integra tots els sensors essencials del teu vaixell en un únic panell de control
+    accessible des del navegador. Sense aplicacions, sense complexitat.
+  </p>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-ico">📍</div>
+      <h3>GPS en temps real</h3>
+      <p>Posició del vaixell actualitzada cada segon amb rastre de la ruta recorreguda. Mapa interactiu amb Leaflet.js.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">⛽</div>
+      <h3>Control de combustible</h3>
+      <p>Monitoratge continu del dipòsit. Alertes automàtiques quan el nivell baixa per sota del 25% i del 10%.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🌡️</div>
+      <h3>Temperatura del motor</h3>
+      <p>Vigilància de la temperatura en temps real. Alerta crítica per sobre de 105°C per evitar avaries greus.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">💧</div>
+      <h3>Bomba de sentina</h3>
+      <p>Sensor crític. Si detecta entrada d'aigua inesperada, el sistema activa l'alarma immediata i envia notificació.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📡</div>
+      <h3>Sistema AIS</h3>
+      <p>Identifica i mostra tots els vaixells propers detectats per l'AIS. Navega amb total consciència situacional.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📷</div>
+      <h3>Càmera en directe</h3>
+      <p>Vigilança visual remota del vaixell. Sistema de reconexió automàtica si la càmera perd la senyal.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">🚨</div>
+      <h3>Sistema d'alertes</h3>
+      <p>Detecció d'errors per timeout (2s), avís als 3 errors consecutius i alarma crítica al 4t. Historial complet.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">📂</div>
+      <h3>Historial de rutes</h3>
+      <p>Cada posició GPS i valors de sensors es guarden automàticament. Consulta i visualitza rutes anteriors al mapa.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-ico">✅</div>
+      <h3>Revisió prèvia</h3>
+      <p>Test automàtic de tots els sistemes abans de sortir a navegar. Informe clar i en pocs segons.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     STATS
+     ══════════════════════════════════════ -->
+<div class="stats-band">
+  <div><div class="stat-n">99.8%</div><div class="stat-l">Disponibilitat del servei</div></div>
+  <div><div class="stat-n">&lt;1s</div><div class="stat-l">Latència dels sensors</div></div>
+  <div><div class="stat-n">6</div><div class="stat-l">Sensors integrats</div></div>
+  <div><div class="stat-n">24/7</div><div class="stat-l">Monitoratge continu</div></div>
+  <div><div class="stat-n">100%</div><div class="stat-l">Accés remot via web</div></div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     COM FUNCIONA
+     ══════════════════════════════════════ -->
+<section class="sec sec-testimonials" id="com-funciona" style="background:var(--off)">
+  <div class="sec-tag">Arquitectura del sistema</div>
+  <h2>Com funciona Navisafe</h2>
+  <p class="sec-intro">Un sistema modular basat en ROS2, Python i web. Cada capa té una funció clara i ben definida.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <h3>Sensors ROS2</h3>
+      <p>Nodes Python publiquen dades de GPS, combustible, motor, sentina, AIS i càmera cada segon via topics ROS2.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <h3>Python Bridge</h3>
+      <p>Una API recull els topics ROS2 i els exposa com a JSON a través d'URLs /api/gps, /api/fuel...</p>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <h3>Apache + PHP</h3>
+      <p>El servidor web Apache serveix la interfície. PHP gestiona el login segur amb sessions i la BBDD SQLite.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">4</div>
+      <h3>Dashboard web</h3>
+      <p>La pàgina web es refresca cada segon amb dades noves per actualitzar el mapa i la informació en temps real.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     PREUS
+     ══════════════════════════════════════ -->
+<section class="sec" id="preus">
+  <div class="sec-tag">Tarifes</div>
+  <h2>Tria el pla que t'encaixa</h2>
+  <p class="sec-intro">Sense compromisos. Comença gratis i amplia quan ho necessitis.</p>
+  <div class="plans">
+    <div class="plan">
+      <div class="plan-name">Bàsic</div>
+      <div class="plan-price">0€<span>/mes</span></div>
+      <p class="plan-desc">Per a propietaris que volen començar a monitorar el seu vaixell sense cost inicial.</p>
+      <ul>
+        <li>GPS en temps real</li>
+        <li>2 sensors bàsics</li>
+        <li>Historial 7 dies</li>
+        <li>1 dispositiu</li>
+        <li>Alertes al navegador</li>
+      </ul>
+      <a href="dashboard.html" class="btn-plan btn-plan-o">Provar ara</a>
+    </div>
+    <div class="plan featured">
+      <div class="plan-badge">MÉS POPULAR</div>
+      <div class="plan-name">Navegant</div>
+      <div class="plan-price">19€<span>/mes</span></div>
+      <p class="plan-desc">Per a navegants habituals que necessiten control total del seu vaixell.</p>
+      <ul>
+        <li>Tots els sensors</li>
+        <li>Alertes SMS + email</li>
+        <li>Historial 90 dies</li>
+        <li>3 dispositius</li>
+        <li>Càmera en directe</li>
+        <li>Revisió prèvia automàtica</li>
+      </ul>
+      <a href="dashboard.html" class="btn-plan btn-plan-p">Començar</a>
+    </div>
+    <div class="plan">
+      <div class="plan-name">Professional</div>
+      <div class="plan-price">49€<span>/mes</span></div>
+      <p class="plan-desc">Per a empreses nàutiques i flotes de vaixells amb necessitats avançades.</p>
+      <ul>
+        <li>Flota de vaixells</li>
+        <li>API pròpia</li>
+        <li>Historial il·limitat</li>
+        <li>Usuaris il·limitats</li>
+        <li>Suport prioritari 24/7</li>
+        <li>Integració sistemes externs</li>
+      </ul>
+      <a href="dashboard.html" class="btn-plan btn-plan-o">Contactar</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     TESTIMONIALS
+     ══════════════════════════════════════ -->
+<section class="sec sec-testimonials" style="background:var(--off)">
+  <div class="sec-tag">Opinió dels usuaris</div>
+  <h2>Navegants que confien en Navisafe</h2>
+  <div class="test-grid">
+    <div class="test">
+      <p class="test-text">"Des que vaig instal·lar Navisafe a la meva embarcació, em sento molt més tranquil quan surto a navegar. Rebo alertes al mòbil i puc veure la temperatura del motor en tot moment."</p>
+      <div class="test-author">Jordi M.</div>
+      <div class="test-role">Propietari de veler · Port de Palamós</div>
+    </div>
+    <div class="test">
+      <p class="test-text">"El sistema de revisió prèvia m'ha evitat sortir al mar amb el nivell de combustible baix dues vegades. Ara és part del meu ritual abans de navegar."</p>
+      <div class="test-author">Anna P.</div>
+      <div class="test-role">Patró d'embarcació esportiva · Blanes</div>
+    </div>
+    <div class="test">
+      <p class="test-text">"Per a la nostra escola nàutica, Navisafe és una eina perfecta. Monitoritzem tota la flota des d'un sol lloc. El pla Professional és molt complet."</p>
+      <div class="test-author">Marc T.</div>
+      <div class="test-role">Director · Escola Nàutica Costa Brava</div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     SOBRE
+     ══════════════════════════════════════ -->
+<section class="sec sec-sobre" id="sobre">
+  <div class="sobre-box">
+    <div class="sec-tag" style="text-align:center">El projecte</div>
+    <h2 style="text-align:center;margin-bottom:1.2rem">Fet a Palamós, per navegants</h2>
+    <p>
+      Navisafe neix com a projecte final de cicle SMX2 a l'Institut de Palamós. Combina
+      tecnologies reals: ROS2 per a la gestió de sensors, Python Flask per a l'API REST,
+      PHP i SQLite per al backend web, i una interfície moderna amb Leaflet.js.
+      L'objectiu és demostrar que es pot construir un sistema professional de monitoratge marítim
+      amb tecnologia de codi obert.
+    </p>
+    <p style="font-size:.85rem; text-align:center;">
+      <strong style="color:var(--teal-d)">Miquel Calzada &amp; Guillem Tarradas</strong><br>
+      Sistemes Microinformàtics i Xarxes · Institut de Palamós · 2026
+    </p>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     CTA FINAL
+     ══════════════════════════════════════ -->
+<div class="cta-band">
+  <h2>Comença a navegar amb seguretat</h2>
+  <p>Accedeix al sistema de monitoratge i comprova en directe com funciona Navisafe amb sensors simulats.</p>
+  <a href="dashboard.html" class="btn-hero btn-p">🚀 Accedir al sistema</a>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     FOOTER
+     ══════════════════════════════════════ -->
+<footer>
+  <div class="footer-logo">
+    <img src="logo_Navisafe.png" alt="Navisafe">
+  </div>
+  <p>© 2026 Navisafe · Institut de Palamós · SMX2</p>
+  <div class="footer-links">
+    <a href="#funcionalitats">Funcionalitats</a>
+    <a href="#preus">Preus</a>
+    <a href="dashboard.html">Accedir</a>
+  </div>
+</footer>
+
+</body>
+</html>
