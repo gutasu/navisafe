@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Navisafe — Panell de Control</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+/* ══ VARIABLES (igual que index_navisafe.html) ══════ */
+:root {
+  --blue:   #1060e8;
+  --blue-d: #0850cc;
+  --teal:   #00c9a7;
+  --teal-d: #00a07d;
+  --navy:   #071e3d;
+  --navy-2: #0d2d52;
+  --white:  #ffffff;
+  --off:    #f4f8fc;
+  --text:   #1a2e3b;
+  --muted:  #5a7a90;
+  --border: #dce8f5;
+  --shadow: rgba(16,96,232,0.10);
+  --ok:     #22c55e;
+  --warn:   #f59e0b;
+  --crit:   #ef4444;
+  --r:      14px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: linear-gradient(160deg, #e8f2ff 0%, #f0fbf8 60%, #ffffff 100%);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+h1, h2, h3 { font-family: 'Syne', sans-serif; }
+.hidden { display: none !important; }
+
+/* ══ LOGIN ══════════════════════════════════════════ */
+#pg-login {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.login-brand {
+  font-family: 'Syne', sans-serif;
+  font-size: .85rem;
+  font-weight: 700;
+  letter-spacing: 5px;
+  text-transform: uppercase;
+  color: var(--teal-d);
+  margin-bottom: 2.5rem;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.login-brand::before,
+.login-brand::after {
+  content: '';
+  width: 30px;
+  height: 1px;
+  background: var(--teal);
+}
+
+.lbox {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 3rem 2.8rem;
+  width: 100%;
+  max-width: 420px;
+  box-shadow: 0 12px 40px var(--shadow), 0 2px 8px rgba(0,0,0,.04);
+  animation: su .45s ease;
+  position: relative;
+  overflow: hidden;
+}
+.lbox::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  border-radius: 20px 20px 0 0;
+}
+
+@keyframes su {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.l-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: .3rem;
+}
+.l-title em { color: var(--teal); font-style: normal; }
+.l-sub {
+  font-size: .8rem;
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  letter-spacing: .3px;
+  margin-bottom: 2rem;
+}
+
+.field { margin-bottom: 1.1rem; }
+.field label {
+  display: block;
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--muted);
+  margin-bottom: .45rem;
+}
+.field input {
+  width: 100%;
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: .78rem 1rem;
+  color: var(--text);
+  font-size: .92rem;
+  font-family: 'DM Sans', sans-serif;
+  outline: none;
+  transition: border-color .2s;
+}
+.field input:focus { border-color: var(--teal); }
+.field input::placeholder { color: var(--muted); }
+
+.l-err {
+  background: rgba(239,68,68,.07);
+  border: 1px solid rgba(239,68,68,.2);
+  border-radius: 8px;
+  padding: .6rem 1rem;
+  font-size: .8rem;
+  color: var(--crit);
+  margin-bottom: .9rem;
+  font-family: 'DM Mono', monospace;
+  display: none;
+}
+.l-err.show { display: block; }
+
+.btn-login {
+  width: 100%;
+  padding: .9rem;
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: .96rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .2s, box-shadow .2s;
+  margin-top: .3rem;
+  box-shadow: 0 4px 16px rgba(16,96,232,.25);
+}
+.btn-login:hover {
+  background: var(--blue-d);
+  box-shadow: 0 6px 24px rgba(16,96,232,.35);
+}
+
+.l-back { margin-top: 1.3rem; text-align: center; font-size: .78rem; color: var(--muted); }
+.l-back a { color: var(--teal-d); cursor: pointer; text-decoration: none; }
+.l-back a:hover { text-decoration: underline; }
+
+/* ══ DASHBOARD ══════════════════════════════════════ */
+#pg-dash {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+/* Header */
+.dh {
+  background: rgba(255,255,255,.97);
+  border-bottom: 1px solid var(--border);
+  padding: .85rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+  box-shadow: 0 2px 12px var(--shadow);
+}
+
+.dh-logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  color: var(--navy);
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.dh-logo em { color: var(--teal); font-style: normal; }
+
+.dh-logo img {
+  height: 32px;
+  width: auto;
+  object-fit: contain;
+}
+
+.dh-r {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+}
+
+/* Indicador "En directe" */
+.live {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .72rem;
+  font-family: 'DM Mono', monospace;
+  color: var(--muted);
+}
+.ldot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--ok);
+  animation: pulse 1.8s infinite;
+}
+.ldot.off   { background: var(--crit); animation: none; }
+.ldot.stale { background: var(--warn); }
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .25; }
+}
+
+/* Avatar */
+.av {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--blue), var(--teal));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-weight: 800;
+  font-size: .8rem;
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(16,96,232,.25);
+}
+
+/* Botons header */
+.btn-out {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: .3rem .8rem;
+  font-size: .74rem;
+  font-family: 'DM Sans', sans-serif;
+  cursor: pointer;
+  transition: all .2s;
+}
+.btn-out:hover {
+  border-color: var(--crit);
+  color: var(--crit);
+}
+
+/* Tabs de navegació */
+.dn {
+  background: var(--white);
+  border-bottom: 1.5px solid var(--border);
+  padding: 0 2rem;
+  display: flex;
+  box-shadow: 0 1px 4px var(--shadow);
+}
+.dn button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  padding: .85rem 1.2rem;
+  cursor: pointer;
+  font-size: .86rem;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  border-bottom: 2.5px solid transparent;
+  transition: all .2s;
+}
+.dn button:hover { color: var(--blue); }
+.dn button.active {
+  color: var(--teal-d);
+  border-bottom-color: var(--teal);
+}
+
+/* Àrea de contingut */
+.db {
+  padding: 1.6rem 2rem;
+  flex: 1;
+}
+.dtab { display: none; }
+.dtab.active { display: block; }
+
+/* Banner d'error */
+.errbanner {
+  background: rgba(239,68,68,.06);
+  border: 1px solid rgba(239,68,68,.18);
+  border-radius: 10px;
+  padding: .8rem 1.2rem;
+  font-size: .81rem;
+  color: var(--crit);
+  margin-bottom: 1.3rem;
+  font-family: 'DM Mono', monospace;
+  display: none;
+}
+.errbanner.show { display: block; }
+
+/* KPI grid */
+.krow {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+/* Cards generals */
+.kpi, .dc {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  box-shadow: 0 4px 18px var(--shadow), 0 1px 4px rgba(0,0,0,.04);
+  transition: border-color .2s, box-shadow .2s;
+}
+.kpi:hover, .dc:hover {
+  border-color: rgba(0,201,167,.35);
+  box-shadow: 0 6px 28px rgba(0,201,167,.1);
+}
+.kpi { padding: 1.1rem 1.3rem; }
+.dc  { padding: 1.2rem 1.4rem; }
+
+.kl {
+  font-size: .67rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: .4rem;
+  font-family: 'DM Mono', monospace;
+}
+.kv {
+  font-family: 'DM Mono', monospace;
+  font-size: 1.9rem;
+  font-weight: 500;
+  color: var(--navy);
+  line-height: 1;
+}
+.ku { font-size: .74rem; color: var(--muted); margin-left: 2px; }
+
+/* Barra de progrés */
+.kb {
+  height: 3px;
+  background: var(--off);
+  border-radius: 2px;
+  margin-top: .8rem;
+}
+.kbf {
+  height: 100%;
+  border-radius: 2px;
+  transition: width .6s, background .5s;
+}
+
+/* Badges d'estat */
+.bs {
+  display: inline-block;
+  font-size: .63rem;
+  font-weight: 700;
+  font-family: 'DM Mono', monospace;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-top: .5rem;
+}
+.bok { background: rgba(34,197,94,.1);   color: var(--ok);   }
+.bwa { background: rgba(245,158,11,.1);  color: var(--warn); }
+.bcr { background: rgba(239,68,68,.1);   color: var(--crit); }
+
+/* Grid 2 columnes */
+.dgrid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.1rem;
+}
+@media (max-width: 860px) { .dgrid { grid-template-columns: 1fr; } }
+
+/* Títol de card */
+.dct {
+  font-size: .67rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Mapa */
+#dmap, #bigmap {
+  border-radius: 10px;
+  border: 1px solid var(--border);
+}
+#dmap   { height: 295px; }
+#bigmap { height: 500px; }
+
+/* Alertes */
+.ai {
+  display: flex;
+  align-items: flex-start;
+  gap: .7rem;
+  padding: .65rem 0;
+  border-bottom: 1px solid var(--border);
+  font-size: .81rem;
+}
+.ai:last-child { border: none; }
+.ad {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 5px;
+}
+.aw { background: var(--warn); }
+.ac { background: var(--crit); }
+.am {
+  flex: 1;
+  color: var(--text);
+  font-family: 'DM Mono', monospace;
+  font-size: .76rem;
+}
+.at {
+  font-size: .68rem;
+  color: var(--muted);
+  white-space: nowrap;
+  font-family: 'DM Mono', monospace;
+}
+
+/* Taula sensors */
+.st { width: 100%; border-collapse: collapse; font-size: .81rem; }
+.st th {
+  text-align: left;
+  color: var(--muted);
+  font-size: .65rem;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  padding: .5rem .7rem;
+  border-bottom: 1px solid var(--border);
+  font-family: 'DM Mono', monospace;
+}
+.st td {
+  padding: .58rem .7rem;
+  border-bottom: 1px solid var(--off);
+  color: var(--text);
+}
+.st tr:last-child td { border: none; }
+
+/* Revisió */
+.cr {
+  display: flex;
+  align-items: center;
+  gap: .9rem;
+  background: var(--off);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: .78rem 1rem;
+  margin-bottom: .55rem;
+  transition: border-color .2s;
+}
+.cr:hover { border-color: var(--teal); }
+.ci { font-size: 1rem; width: 22px; text-align: center; }
+.cn { flex: 1; font-size: .85rem; color: var(--text); }
+
+/* Botó primari (btn-p) */
+.btn-act, .btn-p {
+  background: var(--blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: .7rem 1.6rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: .9rem;
+  transition: background .2s, box-shadow .2s;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 4px 14px rgba(16,96,232,.22);
+}
+.btn-act:hover, .btn-p:hover {
+  background: var(--blue-d);
+  box-shadow: 0 6px 20px rgba(16,96,232,.35);
+}
+
+/* Botó outline (btn-o) */
+.btn-o {
+  background: transparent;
+  color: var(--teal-d);
+  border: 1.5px solid var(--teal);
+  border-radius: 10px;
+  padding: .7rem 1.6rem;
+  font-family: 'Syne', sans-serif;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: .9rem;
+  transition: all .2s;
+}
+.btn-o:hover {
+  background: rgba(0,201,167,.08);
+}
+
+/* Responsive mòbil */
+@media (max-width: 600px) {
+  .dh   { padding: .7rem 1rem; }
+  .dn   { padding: 0 .5rem; overflow-x: auto; }
+  .db   { padding: 1rem; }
+  .krow { grid-template-columns: repeat(2, 1fr); }
+  .dh-logo span { display: none; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN ══════════════════════════════════════════ -->
+<div id="pg-login">
+  <div class="login-brand">Navisafe · Panell de control</div>
+  <div class="lbox">
+    <div class="l-title">Accés al <em>sistema</em></div>
+    <div class="l-sub">Introdueix les teves credencials per continuar</div>
+    <div class="l-err" id="lerr"></div>
+    <div class="field">
+      <label>Nom d'usuari</label>
+      <input type="text" id="lu" placeholder="Usuari" autocomplete="username">
+    </div>
+    <div class="field">
+      <label>Contrasenya</label>
+      <input type="password" id="lp" placeholder="••••••••"
+             autocomplete="current-password"
+             onkeydown="if(event.key==='Enter')doLogin()">
+    </div>
+    <button class="btn-login" onclick="doLogin()">Entrar →</button>
+    <div class="l-back"><a href="index.html">← Tornar a Navisafe.cat</a></div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══════════════════════════════════════ -->
+<div id="pg-dash" class="hidden">
+
+  <!-- Header -->
+  <div class="dh">
+    <div class="dh-logo">
+      <!-- Logo: si tens logo_Navisafe.png, descomenta la línia de sota i esborra el text -->
+      <!-- <img src="logo_Navisafe.png" alt="Navisafe"> -->
+      NAVI<em>SAFE</em> <span style="color:var(--muted);font-weight:400;font-size:.82rem">· Panell de control</span>
+    </div>
+    <div class="dh-r">
+      <div class="live">
+        <div class="ldot" id="ldot"></div>
+        <span id="lstatus">Connectant...</span>
+      </div>
+      <div class="av" id="dav">A</div>
+      <span id="duser" style="font-size:.82rem;color:var(--muted)">—</span>
+      <button class="btn-out" onclick="doLogout()">Sortir</button>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="dn">
+    <button class="active" onclick="dtab('monitor',this)">📊 Monitor</button>
+    <button onclick="dtab('mapa',this)">🗺 Mapa</button>
+    <button onclick="dtab('alertes',this)">🚨 Alertes</button>
+    <button onclick="dtab('revisio',this)">✅ Revisió</button>
+  </div>
+
+  <!-- Contingut -->
+  <div class="db">
+
+    <!-- TAB: Monitor ─────────────────────────────────── -->
+    <div id="tab-monitor" class="dtab active">
+      <div class="errbanner" id="errbanner">
+        ⚠ Sensors desconnectats — executa: <code>python3 main.py --demo</code>
+      </div>
+
+      <!-- KPIs -->
+      <div class="krow">
+        <div class="kpi">
+          <div class="kl">⛽ Combustible</div>
+          <div><span class="kv" id="vf">--</span><span class="ku">%</span></div>
+          <div class="kb"><div class="kbf" id="bf"></div></div>
+          <span class="bs bok" id="sf">—</span>
+        </div>
+        <div class="kpi">
+          <div class="kl">🌡 Motor</div>
+          <div><span class="kv" id="vt">--</span><span class="ku">°C</span></div>
+          <div class="kb"><div class="kbf" id="bt"></div></div>
+          <span class="bs bok" id="st">—</span>
+        </div>
+        <div class="kpi">
+          <div class="kl">💧 Sentina</div>
+          <div><span class="kv" id="vs">--</span><span class="ku">%</span></div>
+          <div class="kb"><div class="kbf" id="bse"></div></div>
+          <span class="bs bok" id="sse">—</span>
+        </div>
+        <div class="kpi">
+          <div class="kl">📡 AIS</div>
+          <div><span class="kv" id="va" style="color:var(--blue)">--</span><span class="ku"> vaix.</span></div>
+          <div id="ais-d" style="margin-top:.6rem;font-size:.68rem;color:var(--muted);font-family:'DM Mono',monospace">—</div>
+        </div>
+        <div class="kpi">
+          <div class="kl">📷 Càmera</div>
+          <div class="kv" id="vc" style="font-size:1.15rem;margin-top:3px">—</div>
+          <span class="bs bok" id="sc">—</span>
+        </div>
+        <div class="kpi">
+          <div class="kl">📍 Velocitat</div>
+          <div><span class="kv" id="vv" style="color:var(--navy)">--</span><span class="ku">kn</span></div>
+          <div style="margin-top:.5rem;font-size:.68rem;color:var(--muted);font-family:'DM Mono',monospace">
+            Rumb: <span id="vr" style="color:var(--blue)">--</span>°
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid mapa + alertes -->
+      <div class="dgrid">
+        <div class="dc">
+          <div class="dct">📍 Posició GPS — temps real</div>
+          <div id="dmap"></div>
+          <div style="margin-top:.75rem;font-size:.7rem;font-family:'DM Mono',monospace;color:var(--muted)">
+            Lat: <span id="glat" style="color:var(--teal-d)">--</span> &middot;
+            Lon: <span id="glon" style="color:var(--teal-d)">--</span>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:1rem">
+          <div class="dc">
+            <div class="dct">🚨 Alertes recents</div>
+            <div id="aprev"></div>
+          </div>
+          <div class="dc">
+            <div class="dct">📋 Resum sensors</div>
+            <table class="st">
+              <thead><tr><th>Sensor</th><th>Valor</th><th>Estat</th></tr></thead>
+              <tbody id="stbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Mapa gran ───────────────────────────────── -->
+    <div id="tab-mapa" class="dtab">
+      <div class="dc">
+        <div class="dct">🗺 Mapa GPS + historial de rutes</div>
+        <div id="bigmap"></div>
+        <div style="margin-top:.85rem;display:flex;gap:1.5rem;flex-wrap:wrap;font-size:.7rem;font-family:'DM Mono',monospace;color:var(--muted)">
+          <span>Lat: <strong style="color:var(--teal-d)" id="ml">--</strong></span>
+          <span>Lon: <strong style="color:var(--teal-d)" id="mn">--</strong></span>
+          <span>Vel: <strong style="color:var(--blue)" id="mv">--</strong> kn</span>
+          <span>Rumb: <strong style="color:var(--blue)" id="mr">--</strong>°</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Alertes ─────────────────────────────────── -->
+    <div id="tab-alertes" class="dtab">
+      <div class="dc">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+          <div class="dct" style="margin:0">🚨 Historial d'alertes</div>
+          <button onclick="alertHist=[];renderAlerts()"
+            style="background:none;border:1px solid var(--border);color:var(--muted);border-radius:6px;padding:.28rem .7rem;font-size:.72rem;cursor:pointer;transition:all .2s"
+            onmouseover="this.style.borderColor='var(--crit)';this.style.color='var(--crit)'"
+            onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">
+            Netejar
+          </button>
+        </div>
+        <div id="allert"></div>
+      </div>
+    </div>
+
+    <!-- TAB: Revisió ─────────────────────────────────── -->
+    <div id="tab-revisio" class="dtab">
+      <div class="dc" style="max-width:560px">
+        <div class="dct">✅ Revisió prèvia a la navegació</div>
+        <button class="btn-act" onclick="runCheck()">▶ Executar test complet</button>
+        <div id="cklist"></div>
+        <div id="ckres" style="margin-top:1.1rem;font-weight:700;font-size:.88rem;font-family:'DM Mono',monospace"></div>
+      </div>
+    </div>
+
+  </div><!-- /db -->
+</div><!-- /pg-dash -->
+
+<script>
+// ══ LOGIN ════════════════════════════════════════════
+async function doLogin() {
+  const u   = document.getElementById('lu').value.trim();
+  const p   = document.getElementById('lp').value;
+  const err = document.getElementById('lerr');
+  err.classList.remove('show');
+
+  if (!u || !p) {
+    err.textContent = 'Omple tots els camps.';
+    err.classList.add('show');
+    return;
+  }
+
+  try {
+    const r = await fetch('php/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username: u, password: p })
+    });
+    const d = await r.json();
+
+    if (d.ok) {
+      document.getElementById('duser').textContent = d.username;
+      document.getElementById('dav').textContent   = d.username[0].toUpperCase();
+      document.getElementById('pg-login').classList.add('hidden');
+      document.getElementById('pg-dash').classList.remove('hidden');
+      setTimeout(initDash, 80);
+    } else {
+      err.textContent = d.error || 'Credencials incorrectes.';
+      err.classList.add('show');
+      document.getElementById('lp').value = '';
+    }
+  } catch(e) {
+    err.textContent = 'No s\'ha pogut connectar amb el servidor.';
+    err.classList.add('show');
+  }
+}
+
+// ══ LOGOUT ═══════════════════════════════════════════
+async function doLogout() {
+  try {
+    await fetch('php/login.php', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'logout' })
+    });
+  } catch(e) { /* silenci */ }
+
+  clearInterval(tid);
+  lmap = bmap = null;
+
+  document.getElementById('pg-dash').classList.add('hidden');
+  document.getElementById('pg-login').classList.remove('hidden');
+  document.getElementById('lu').value = '';
+  document.getElementById('lp').value = '';
+}
+
+// ══ TABS ═════════════════════════════════════════════
+function dtab(name, btn) {
+  document.querySelectorAll('.dtab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.dn button').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+  if (name === 'mapa' && !bmap) initBigMap();
+}
+
+// ══ MAPES ════════════════════════════════════════════
+let lmap = null, bmap = null, lmk = null, bmk = null, ltr = null, btr = null;
+
+function mkMap(id) {
+  // Coordenades reals zona Palamós (del sensors_demo.py)
+  const LAT0 = 41.84779, LON0 = 3.13497;
+  const MIN_LAT = 41.84775, MAX_LAT = 41.84782;
+  const MIN_LON = 3.13490,  MAX_LON = 3.13505;
+
+  const m = L.map(id).setView([LAT0, LON0], 16);
+
+  // ── Tile CartoDB Voyager: estil tipus Google Maps
+  //    Terra en colors naturals, mar blau clar, noms de poblacions,
+  //    carreteres, ports i accidents geogràfics visibles
+  L.tileLayer(
+    'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+    {
+      attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> © <a href="https://carto.com/">CARTO</a> | Navisafe',
+      subdomains: 'abcd',
+      maxZoom: 20
+    }
+  ).addTo(m);
+
+  // ── Zona de navegació definida al sensors_demo.py (rectangle puntejat)
+  L.rectangle(
+    [[MIN_LAT, MIN_LON], [MAX_LAT, MAX_LON]],
+    {
+      color: '#1060e8', weight: 2, dashArray: '6 4',
+      fillColor: '#1060e8', fillOpacity: 0.07
+    }
+  ).addTo(m).bindPopup(
+    '<b style="font-family:DM Sans,sans-serif">Zona de navegació</b><br>' +
+    '<span style="font-size:.78rem;font-family:DM Mono,monospace;color:#5a7a90">' +
+    'Palamós · coordenades sensors_demo.py</span>'
+  );
+
+  // ── Radi de seguretat (200 m)
+  L.circle([LAT0, LON0], {
+    radius: 200,
+    color: '#00c9a7', weight: 1.5, dashArray: '4 4',
+    fillColor: '#00c9a7', fillOpacity: 0.04
+  }).addTo(m).bindPopup(
+    '<b style="font-family:DM Sans,sans-serif">Radi de maniobra</b><br>' +
+    '<span style="font-size:.78rem;font-family:DM Mono,monospace;color:#5a7a90">200 m al voltant del punt inicial</span>'
+  );
+
+  // ── Icona vaixell
+  const icon = L.divIcon({
+    html: '<div style="font-size:22px;filter:drop-shadow(0 2px 5px rgba(0,0,0,.35))">🚤</div>',
+    iconAnchor: [11, 11],
+    className: ''
+  });
+
+  const mk = L.marker([LAT0, LON0], { icon })
+    .addTo(m)
+    .bindPopup(
+      '<b style="font-family:DM Sans,sans-serif">Navisafe</b><br>' +
+      '<span style="font-size:.78rem;font-family:DM Mono,monospace;color:#5a7a90">' +
+      'GPS: ' + LAT0 + ', ' + LON0 + '</span>'
+    );
+
+  // ── Traça de ruta
+  const tr = L.polyline([], {
+    color: '#1060e8', weight: 3, opacity: 0.75,
+    lineCap: 'round', lineJoin: 'round'
+  }).addTo(m);
+
+  return { m, mk, tr };
+}
+
+function initBigMap() {
+  const d = mkMap('bigmap');
+  bmap = d.m; bmk = d.mk; btr = d.tr;
+}
+
+// ══ FETCH SENSORS ════════════════════════════════════
+let tid = null, alertHist = [], lastD = null;
+const API = 'http://localhost:5000/api/all';
+
+function initDash() {
+  if (!lmap) { const d = mkMap('dmap'); lmap = d.m; lmk = d.mk; ltr = d.tr; }
+  clearInterval(tid);
+  fetchAll();
+  tid = setInterval(fetchAll, 1000);
+}
+
+async function fetchAll() {
+  try {
+    const r = await fetch(API);
+    if (!r.ok) throw new Error();
+    const d = await r.json();
+    if (d.error) { setOff(); return; }
+    lastD = d;
+    setOn(d.stale);
+    updateUI(d);
+  } catch(e) { setOff(); }
+}
+
+function setOn(s) {
+  document.getElementById('ldot').className      = 'ldot' + (s ? ' stale' : '');
+  document.getElementById('lstatus').textContent = s ? 'Dades antigues' : 'En directe';
+  document.getElementById('errbanner').classList.remove('show');
+}
+function setOff() {
+  document.getElementById('ldot').className      = 'ldot off';
+  document.getElementById('lstatus').textContent = 'Sensors desconnectats';
+  document.getElementById('errbanner').classList.add('show');
+}
+
+// ══ ACTUALITZAR UI ═══════════════════════════════════
+function updateUI(d) {
+  const { gps: g, fuel: f, engine: mo, water: se, ais: ai, camera: ca } = d;
+
+  if (g?.lat) {
+    T('glat', g.lat); T('glon', g.lon);
+    T('ml', g.lat);   T('mn', g.lon);
+    T('mv', g.speed_kn); T('mr', g.heading);
+    T('vv', g.speed_kn, 'var(--navy)'); T('vr', g.heading);
+    if (lmk) { lmk.setLatLng([g.lat, g.lon]); ltr.setLatLngs((g.trail || []).map(p => [p.lat, p.lon])); }
+    if (bmk) { bmk.setLatLng([g.lat, g.lon]); btr.setLatLngs((g.trail || []).map(p => [p.lat, p.lon])); }
+  }
+  if (f) {
+    const c = f.status === 'CRITICAL' ? 'var(--crit)' : f.status === 'WARNING' ? 'var(--warn)' : 'var(--teal-d)';
+    T('vf', f.value, c); Br('bf', f.value, c); Bg('sf', f.status);
+  }
+  if (mo) {
+    const c = mo.status === 'CRITICAL' ? 'var(--crit)' : mo.status === 'WARNING' ? 'var(--warn)' : 'var(--ok)';
+    T('vt', mo.value, c); Br('bt', ((mo.value - 50) / 70) * 100, c); Bg('st', mo.status);
+  }
+  if (se) {
+    const c = se.status === 'CRITICAL' ? 'var(--crit)' : se.status === 'WARNING' ? 'var(--warn)' : 'var(--ok)';
+    T('vs', se.value, c); Br('bse', se.value, c); Bg('sse', se.status);
+  }
+  if (ai) {
+    T('va', ai.value, 'var(--blue)');
+    document.getElementById('ais-d').textContent = (ai.vessels || []).join(', ') || '—';
+  }
+  if (ca) {
+    document.getElementById('vc').textContent = ca.available ? '✅ En línia' : '❌ Error';
+    const e = document.getElementById('sc');
+    e.textContent = ca.status;
+    e.className = 'bs ' + (ca.available ? 'bok' : 'bcr');
+  }
+
+  // Taula resum sensors
+  document.getElementById('stbody').innerHTML = [
+    ['GPS',     g  ? `${g.lat}, ${g.lon}` : '—', 'OK'],
+    ['Fuel',    f  ? f.value + '%' : '—',          f  ? f.status  : '—'],
+    ['Motor',   mo ? mo.value + '°C' : '—',        mo ? mo.status : '—'],
+    ['Sentina', se ? se.value + '%' : '—',         se ? se.status : '—'],
+    ['AIS',     ai ? ai.value + ' vaix.' : '—',    'OK'],
+    ['Càmera',  ca ? (ca.available ? 'OK' : 'Offline') : '—', ca ? ca.status : '—'],
+  ].map(([n, v, s]) => `<tr>
+    <td style="color:var(--text)">${n}</td>
+    <td style="color:var(--blue);font-family:'DM Mono',monospace">${v}</td>
+    <td><span class="bs ${s === 'OK' ? 'bok' : s === 'WARNING' ? 'bwa' : 'bcr'}">${s}</span></td>
+  </tr>`).join('');
+
+  // Alertes
+  (d.alerts || []).forEach(a => {
+    if (!alertHist.find(x => x.message === a.message && x.time_str === a.time_str))
+      alertHist.push(a);
+  });
+  alertHist = alertHist.slice(-30);
+  renderAlerts();
+}
+
+function renderAlerts() {
+  const rec = alertHist.slice(-3).reverse();
+  document.getElementById('aprev').innerHTML = rec.length
+    ? rec.map(a => `<div class="ai">
+        <div class="ad ${a.level === 'CRITICAL' ? 'ac' : 'aw'}"></div>
+        <div class="am">${a.message}</div>
+        <div class="at">${a.time_str}</div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);font-size:.76rem;padding:.4rem 0;font-family:DM Mono,monospace">Cap alerta activa</div>';
+
+  document.getElementById('allert').innerHTML = alertHist.length
+    ? [...alertHist].reverse().map(a => `<div class="ai">
+        <div class="ad ${a.level === 'CRITICAL' ? 'ac' : 'aw'}"></div>
+        <div class="am">${a.message}</div>
+        <div class="at">${a.time_str}</div>
+      </div>`).join('')
+    : '<div style="color:var(--muted);text-align:center;padding:2rem;font-family:DM Mono,monospace">Cap alerta registrada.</div>';
+}
+
+// ══ REVISIÓ PRÈVIA ═══════════════════════════════════
+const CHECKS = [
+  { ico: '📍', nom: 'Senyal GPS',        ok: () => lastD?.gps?.lat },
+  { ico: '⛽', nom: 'Combustible',        ok: () => lastD?.fuel?.status !== 'CRITICAL' },
+  { ico: '🌡', nom: 'Temperatura motor',  ok: () => lastD?.engine?.status !== 'CRITICAL' },
+  { ico: '💧', nom: 'Bomba de sentina',   ok: () => lastD?.water?.status !== 'CRITICAL' },
+  { ico: '📡', nom: 'Sistema AIS',        ok: () => lastD?.ais != null },
+  { ico: '📷', nom: 'Càmera',             ok: () => lastD?.camera?.available },
+];
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+async function runCheck() {
+  if (!lastD) { alert('Sensors no actius! Executa main.py --demo primer.'); return; }
+  const list = document.getElementById('cklist');
+  const res  = document.getElementById('ckres');
+  list.innerHTML = ''; res.textContent = '';
+  let ok = 0;
+
+  for (let i = 0; i < CHECKS.length; i++) {
+    const c   = CHECKS[i];
+    const div = document.createElement('div');
+    div.className = 'cr';
+    div.innerHTML = `<span class="ci">${c.ico}</span>
+      <span class="cn">${c.nom}</span>
+      <span id="cr${i}" style="font-size:.77rem;font-weight:600;font-family:'DM Mono',monospace;color:var(--muted)">⏳ Comprovant...</span>`;
+    list.appendChild(div);
+    await sleep(550);
+    const pass = c.ok();
+    if (pass) ok++;
+    document.getElementById('cr' + i).innerHTML = pass
+      ? `<span style="color:var(--ok)">✅ Correcte</span>`
+      : `<span style="color:var(--crit)">❌ Error</span>`;
+  }
+
+  res.style.color = ok === CHECKS.length ? 'var(--ok)' : ok > CHECKS.length / 2 ? 'var(--warn)' : 'var(--crit)';
+  res.textContent = ok === CHECKS.length
+    ? `✅ Tot correcte (${ok}/${CHECKS.length}) — Es pot navegar`
+    : `⚠ ${ok}/${CHECKS.length} sensors OK — Revisar errors`;
+}
+
+// ══ HELPERS ══════════════════════════════════════════
+function T(id, v, c) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.textContent = v;
+  if (c) e.style.color = c;
+}
+function Br(id, pct, c) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.style.width = Math.min(Math.max(+pct || 0, 0), 100) + '%';
+  e.style.background = c;
+}
+function Bg(id, estat) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.textContent = estat;
+  e.className = 'bs ' + (estat === 'OK' ? 'bok' : estat === 'WARNING' ? 'bwa' : 'bcr');
+}
+</script>
+</body>
+</html>
